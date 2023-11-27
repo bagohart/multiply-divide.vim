@@ -42,8 +42,11 @@ function! multiply_divide#Divide()
         " then, in visual mode, search backward for the next digit which is not preceded by another digit or decimal point
         call search('\v(^|[^0-9\.]\d)', 'bceW')
         normal! "zygv
-        let number = (match(@z, '\V.') != -1) ? str2float(@z) : str2nr(@z)
-        execute 'normal! "_c' . string(number / count)
+        let old_number = (match(@z, '\V.') != -1) ? str2float(@z) : str2nr(@z)
+        let new_number = type(old_number) == v:t_number && old_number % count != 0 ?
+                    \ str2float(old_number) / count :
+                    \ old_number / count
+        execute 'normal! "_c' . string(new_number)
         call setreg("z", save_z, save_z_type)
     endfunction
     let &opfunc=get(funcref('s:inner'), 'name')
